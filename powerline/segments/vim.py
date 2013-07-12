@@ -8,12 +8,8 @@ try:
 except ImportError:
 	vim = {}  # NOQA
 
-<<<<<<< HEAD
 from subprocess import Popen, PIPE
-from powerline.bindings.vim import vim_get_func, getbufvar
-=======
 from powerline.bindings.vim import vim_get_func, getbufvar, vim_getbufoption
->>>>>>> remotes/upstream/develop
 from powerline.theme import requires_segment_info
 from powerline.lib import add_divider_highlight_group
 from powerline.lib.vcs import guess, tree_status
