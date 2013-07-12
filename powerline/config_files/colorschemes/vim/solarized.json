@@ -31,6 +31,7 @@
 		"ruby_version":           { "fg": "red", "bg": "royalblue5", "attr": ["bold"]},
 		"syntastic_segment":      { "fg": "brightestred", "bg": "gray2", "attr": ["bold"] },
 		"unite_segment":          { "fg": "lightyellow", "bg": "darkgreencopper" }
+		"environment":              { "fg": "gray61", "bg": "royalblue5" }
 	},
 	"mode_translations": {
 		"nc": {

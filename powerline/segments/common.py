@@ -23,6 +23,16 @@ cpu_count = None
 
 
 @requires_segment_info
+def environment(pl, segment_info, variable=None):
+	'''Return the value of any defined environment variable
+
+	:param string variable:
+		The environment variable to return if found
+	'''
+	return segment_info['environ'].get(variable, None)
+
+
+@requires_segment_info
 def hostname(pl, segment_info, only_if_ssh=False, exclude_domain=False):
 	'''Return the current hostname.
 
@@ -43,7 +53,7 @@ def branch(pl, segment_info, status_colors=False):
 	'''Return the current VCS branch.
 
 	:param bool status_colors:
-		determines whether repository status will be used to determine highlighting. Default: True.
+		determines whether repository status will be used to determine highlighting. Default: False.
 
 	Highlight groups used: ``branch_clean``, ``branch_dirty``, ``branch``.
 	'''
@@ -701,7 +711,7 @@ class NetworkLoadSegment(KwThreadedSegment):
 			self.interfaces[interface] = idata
 
 		idata['last'] = (monotonic(), _get_bytes(interface))
-		return idata
+		return idata.copy()
 
 	def render_one(self, idata, recv_format='⬇ {value:>8}', sent_format='⬆ {value:>8}', suffix='B/s', si_prefix=False, **kwargs):
 		if not idata or 'prev' not in idata:
@@ -713,14 +723,15 @@ class NetworkLoadSegment(KwThreadedSegment):
 
 		if None in (b1, b2):
 			return None
-		if measure_interval == 0:
-			self.error('Measure interval is zero. This should not happen')
-			return None
 
 		r = []
 		for i, key in zip((0, 1), ('recv', 'sent')):
 			format = locals()[key + '_format']
-			value = (b2[i] - b1[i]) / measure_interval
+			try:
+				value = (b2[i] - b1[i]) / measure_interval
+			except ZeroDivisionError:
+				self.warn('Measure interval zero.')
+				value = 0
 			max_key = key + '_max'
 			is_gradient = max_key in kwargs
 			hl_groups = ['network_load_' + key, 'network_load']
